@@ -1,0 +1,413 @@
+!DOC<TYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alimente o bichinho</title>
+    <!-- Carregando fonte divertida do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Reset e Estilos Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            padding: 20px;
+        }
+
+        /* Cartão Principal do Jogo */
+        .game-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 32px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 4px solid #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Título do Jogo */
+        h1 {
+            color: #4A4E69;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #9A8C98;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        /* Área do Bichinho Virtual */
+        .pet-stage {
+            background: radial-gradient(circle, #FFF8E7 0%, #FFE8D6 100%);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            border: 3px dashed #FFD166;
+            transition: all 0.3s ease;
+        }
+
+        .pet-stage.happy-mode {
+            background: radial-gradient(circle, #E0FBE2 0%, #BFF6C3 100%);
+            border-color: #06D6A0;
+            box-shadow: 0 0 25px rgba(6, 214, 160, 0.3);
+        }
+
+        /* Ilustração SVG do Bichinho */
+        .pet-svg {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            display: block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Animações do Bichinho */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+
+        .animate-bounce {
+            animation: bounce 0.5s ease;
+        }
+
+        .animate-wiggle {
+            animation: wiggle 0.5s ease;
+        }
+
+        /* Placar de Felicidade */
+        .score-box {
+            background-color: #F8F9FA;
+            border-radius: 20px;
+            padding: 12px 24px;
+            display: inline-block;
+            margin-bottom: 16px;
+            border: 2px solid #E9ECEF;
+        }
+
+        #score-display {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #FF6B6B;
+        }
+
+        /* Mensagem de Vitória */
+        .message-area {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #victory-message {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #059669;
+            background-color: #D1FAE5;
+            padding: 8px 18px;
+            border-radius: 16px;
+            border: 2px solid #34D399;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none;
+        }
+
+        #victory-message.visible {
+            display: inline-block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Botões de Ação */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 18px;
+            padding: 14px 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none !important;
+        }
+
+        /* Botão Dar um lanche */
+        #btn-feed {
+            background-color: #FF9F1C;
+            box-shadow: 0 5px 0 #D97706;
+        }
+
+        #btn-feed:hover:not(:disabled) {
+            background-color: #FFB041;
+        }
+
+        /* Botão Brincar */
+        #btn-play {
+            background-color: #4CC9F0;
+            box-shadow: 0 5px 0 #0096C7;
+        }
+
+        #btn-play:hover:not(:disabled) {
+            background-color: #6AD4F5;
+        }
+
+        /* Estado Desativado dos Botões */
+        button:disabled {
+            background-color: #CBD5E1 !important;
+            color: #94A3B8 !important;
+            box-shadow: 0 4px 0 #94A3B8 !important;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
+        /* Botão Recomeçar */
+        #btn-restart {
+            background-color: #F43F5E;
+            box-shadow: 0 5px 0 #BE123C;
+            margin-top: 6px;
+            width: 100%;
+        }
+
+        #btn-restart:hover {
+            background-color: #FB7185;
+        }
+
+        /* Partículas flutuantes (+1, +2) */
+        .floating-point {
+            position: absolute;
+            font-weight: 700;
+            font-size: 1.4rem;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-45px) scale(1.3); }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="game-card">
+        <h1>Alimente o bichinho</h1>
+        <p class="subtitle">Cuide bem dele até alcançar 5 pontos!</p>
+
+        <!-- Palco do Bichinho -->
+        <div class="pet-stage" id="pet-stage">
+            <!-- Ilustração SVG interativa do bichinho -->
+            <svg class="pet-svg" id="pet-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Orelhas -->
+                <circle cx="52" cy="55" r="24" fill="#FFB5A7" />
+                <circle cx="52" cy="55" r="14" fill="#FCD5CE" />
+                <circle cx="148" cy="55" r="24" fill="#FFB5A7" />
+                <circle cx="148" cy="55" r="14" fill="#FCD5CE" />
+                
+                <!-- Corpo / Cabeça -->
+                <rect x="35" y="45" width="130" height="125" rx="60" fill="#FFB5A7" />
+                
+                <!-- Barriguinha -->
+                <ellipse cx="100" cy="135" rx="40" ry="28" fill="#FCD5CE" />
+
+                <!-- Bochechas Rosadas -->
+                <ellipse cx="60" cy="112" rx="12" ry="7" fill="#FF758F" opacity="0.6" />
+                <ellipse cx="140" cy="112" rx="12" ry="7" fill="#FF758F" opacity="0.6" />
+
+                <!-- Expressão Normal / Faminta (0 a 4 pontos) -->
+                <g id="face-normal">
+                    <!-- Olhos -->
+                    <circle cx="72" cy="95" r="9" fill="#2B2D42" />
+                    <circle cx="75" cy="92" r="3" fill="#FFFFFF" />
+                    <circle cx="128" cy="95" r="9" fill="#2B2D42" />
+                    <circle cx="131" cy="92" r="3" fill="#FFFFFF" />
+                    <!-- Bocas pequenas -->
+                    <path d="M 92 110 Q 100 116 108 110" stroke="#2B2D42" stroke-width="4" fill="none" stroke-linecap="round" />
+                </g>
+
+                <!-- Expressão Super Feliz (>= 5 pontos) -->
+                <g id="face-happy" style="display: none;">
+                    <!-- Olhos fechados sorrindo (^ ^) -->
+                    <path d="M 62 98 Q 72 84 82 98" stroke="#2B2D42" stroke-width="5" fill="none" stroke-linecap="round" />
+                    <path d="M 118 98 Q 128 84 138 98" stroke="#2B2D42" stroke-width="5" fill="none" stroke-linecap="round" />
+                    <!-- Sorriso grande aberto -->
+                    <path d="M 82 108 Q 100 135 118 108 Z" fill="#FF4D6D" stroke="#2B2D42" stroke-width="3" stroke-linejoin="round" />
+                    <!-- Coraçãozinho flutuando -->
+                    <path d="M 155 45 C 155 38, 165 38, 165 45 C 165 38, 175 38, 175 45 C 175 55, 165 62, 165 62 C 165 62, 155 55, 155 45 Z" fill="#FF4D6D" />
+                </g>
+            </svg>
+        </div>
+
+        <!-- Contador de Felicidade -->
+        <div class="score-box">
+            <span id="score-display">Felicidade: 0</span>
+        </div>
+
+        <!-- Área da Mensagem Final -->
+        <div class="message-area">
+            <div id="victory-message">🎉 Seu bichinho está feliz!</div>
+        </div>
+
+        <!-- Botões de Interação -->
+        <div class="controls">
+            <div class="action-row">
+                <button id="btn-feed" type="button">
+                    🍎 Dar um lanche
+                </button>
+                <button id="btn-play" type="button">
+                    🎾 Brincar
+                </button>
+            </div>
+            <button id="btn-restart" type="button">
+                🔄 Recomeçar
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Variável principal que guarda os pontos de felicidade
+        let felicidade = 0;
+
+        // Referências aos elementos da tela (DOM)
+        const scoreDisplay = document.getElementById('score-display');
+        const victoryMessage = document.getElementById('victory-message');
+        const btnFeed = document.getElementById('btn-feed');
+        const btnPlay = document.getElementById('btn-play');
+        const btnRestart = document.getElementById('btn-restart');
+        const petSvg = document.getElementById('pet-svg');
+        const petStage = document.getElementById('pet-stage');
+        const faceNormal = document.getElementById('face-normal');
+        const faceHappy = document.getElementById('face-happy');
+
+        /**
+         * Cria um pequeno texto flutuante (+1 ou +2) sobre o bichinho
+         */
+        function mostrarPontosFlutuantes(texto, cor) {
+            const floatEl = document.createElement('span');
+            floatEl.textContent = texto;
+            floatEl.className = 'floating-point';
+            floatEl.style.color = cor;
+            floatEl.style.left = (45 + Math.random() * 10) + '%';
+            floatEl.style.top = '40%';
+            
+            petStage.appendChild(floatEl);
+            
+            setTimeout(() => {
+                floatEl.remove();
+            }, 800);
+        }
+
+        /**
+         * Aplica uma animação rápida no bichinho ao interagir
+         */
+        function animarBichinho(classeAnimacao) {
+            petSvg.classList.remove('animate-bounce', 'animate-wiggle');
+            // Força o navegador a reiniciar a animação
+            void petSvg.offsetWidth;
+            petSvg.classList.add(classeAnimacao);
+        }
+
+        /**
+         * Atualiza a pontuação na tela e verifica se atingiu 5 ou mais pontos
+         */
+        function atualizarInterface() {
+            // Atualiza o texto do contador
+            scoreDisplay.textContent = `Felicidade: ${felicidade}`;
+
+            // Verifica a condição de vitória (>= 5 pontos)
+            if (felicidade >= 5) {
+                victoryMessage.classList.add('visible');
+                btnFeed.disabled = true;
+                btnPlay.disabled = true;
+
+                // Muda a expressão do bichinho para super feliz
+                petStage.classList.add('happy-mode');
+                faceNormal.style.display = 'none';
+                faceHappy.style.display = 'block';
+            } else {
+                victoryMessage.classList.remove('visible');
+                btnFeed.disabled = false;
+                btnPlay.disabled = false;
+
+                // Mantém a expressão normal
+                petStage.classList.remove('happy-mode');
+                faceNormal.style.display = 'block';
+                faceHappy.style.display = 'none';
+            }
+        }
+
+        // Evento: Clicar em "Dar um lanche" (+1 ponto)
+        btnFeed.addEventListener('click', () => {
+            felicidade += 1;
+            animarBichinho('animate-bounce');
+            mostrarPontosFlutuantes('+1 🍎', '#D97706');
+            atualizarInterface();
+        });
+
+        // Evento: Clicar em "Brincar" (+2 pontos)
+        btnPlay.addEventListener('click', () => {
+            felicidade += 2;
+            animarBichinho('animate-wiggle');
+            mostrarPontosFlutuantes('+2 🎾', '#0096C7');
+            atualizarInterface();
+        });
+
+        // Evento: Clicar em "Recomeçar" (zera tudo e reativa os botões)
+        btnRestart.addEventListener('click', () => {
+            felicidade = 0;
+            animarBichinho('animate-bounce');
+            atualizarInterface();
+        });
+    </script>
+</body>
+</html>
