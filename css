@@ -1,0 +1,59 @@
+body {
+  background-color: #e0f7fa;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
+}
+
+h1 {
+  margin-top: 0;
+  color: #333333;
+}
+
+.bichinho {
+  font-size: 5rem;
+  margin: 1rem 0;
+}
+
+#contador {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #555555;
+}
+
+button {
+  background-color: #ff7043;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #f4511e;
+}
+
+#mensagem {
+  margin-top: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2e7d32;
+  min-height: 1.5rem;
+}
